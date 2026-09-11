@@ -1,0 +1,6 @@
+# Git-pinned first-party planes at their release tags (no index yet). Install BEFORE `pip install .` so the ranges resolve.
+loomground-governance @ git+https://github.com/flxk1/loomground-governance@cf09ad8336c0ef47e700952896314472129fa4c7
+loomground-workspace @ git+https://github.com/flxk1/loomground-workspace@e6e5e7dae8dc11e089a11dc15f3b519d2e4750ad
+# Unpublished siblings: install each from its dist/*.whl until published, then uncomment at the release sha.
+# loomground-audit-chain @ git+https://github.com/flxk1/loomground-audit-chain@7a6e7a4dab006862391d35309c1a65a3023992b3
+# loomground-lock @ git+https://github.com/flxk1/loomground-lock@b9dc09f8793720f4f94c3e3917a119d6acb7eec7

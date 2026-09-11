@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Build + tooling artifacts
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store

@@ -1,0 +1,17 @@
+Loomground Erasure
+Copyright 2026 flxk1
+
+This product includes materials developed for the Loomground project.
+
+The prose in README.md is licensed under the Creative Commons Attribution 4.0
+International license (see LICENSES/CC-BY-4.0.txt).
+
+The Python implementation, tests, and repository tooling are licensed under the
+Apache License, Version 2.0 (see LICENSES/Apache-2.0.txt).
+
+Authorship and AI assistance: all code and documentation are authored by the
+project's human author(s), who hold the copyright. Generative AI tools were used
+to assist with development. An AI system is a tool, not an author or a
+contributor: it holds no copyright and makes no copyright claim, and AI systems
+cannot hold copyright. This assistance is acknowledged here, not recorded as
+authorship.

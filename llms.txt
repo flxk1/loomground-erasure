@@ -1,0 +1,39 @@
+# loomground-erasure
+
+> Controller-signed erasure over a signed audit chain: sweep, composite tombstone, pending markers for sealed stores, a ledger that refuses re-ingestion.
+
+## Problem
+Erasure means deleting a row; the subject returns with the next ingest. A controller-signed sweep with composite tombstone, pending-erase markers for sealed stores and a forgotten-subjects ledger.
+
+## Install
+```
+pip install -r requirements-dev.txt && pip install loomground-erasure
+```
+
+Requires `loomground-audit-chain` 0.1, `loomground-lock` 0.1, `loomground-governance` 0.11, `loomground-workspace` 0.1, `cryptography`. Python 3.10+.
+
+## Usage
+```python
+from loomground_erasure import ErasureHost, execute, request, status, sweep
+
+host = ErasureHost(scan_cards=..., redact_cards=..., erase_versum_mirror=...)   # each port optional
+req = request("ws", "Jane Doe", requester_ref="dsar:7", reason="Art. 17(1)(b)", log_root="logs")
+preview = sweep("ws", "Jane Doe", log_root="logs", host=host)       # preview.blind_spots names absent ports
+report = execute("ws", "Jane Doe", legal_basis="art_17_1_b", requester_ref="dsar:7",
+                 reason="Art. 17(1)(b)", log_root="logs", request_id=req["request_id"], host=host)
+status("ws", req["request_id"], log_root="logs")
+```
+
+## Interface
+- States, in the `.lg` alphabet read from `loomground_governance.vocabulary("verdicts")`: `request` → `human` (a person reviews before anything acts) · `sweep` / `dry_run` → `auto` (read only) · `execute` → `auto` when the controller key co-signs; controller key missing → `refused` (`require_controller=True` raises `ControllerKeyMissingError`; the default purges single-key and records `erasure_mode`)
+- `request(folder, subject, *, requester_ref, reason, log_root=, actor=)` → `{request_id, audit_id, folder}` · `sweep(folder, subject, *, cascade=, log_root=, host=)` → `SweepReport(hits_by_kind, hits_by_folder, estimated_tombstone, versum_sealed, blind_spots)` · `execute(folder, subject, *, legal_basis, requester_ref, reason, cascade=, dry_run=, log_root=, request_id=, queue_if_sealed=, host=, require_controller=)` → `ExecutionReport` · `status(folder, request_id, log_root=)` → manifest
+- `legal_basis` ∈ `loomground_audit_chain.mutation_log.VALID_LEGAL_BASES`
+- Ports (`ErasureHost`, each optional): `pair_from_event`, `discover_descendants`, `replace_ci`, `scan_drafts`, `redact_drafts`, `scan_cards`, `redact_cards`, `erase_versum_mirror`. An absent port is a named blind spot on the report and on the composite tombstone; the chain purge completes.
+- `pending_erase`: `arm_marker`, `discover_sealed_in_scope`, `verify_markers_for_unseal`, `apply_markers`, `bind_seal_hooks(host)`; flag `WORKSPACE_PENDING_ERASE=1`
+- `forgotten_subjects`: `ensure`, `check`, `check_text`, `contains`, `list_subjects`, `purged_pair_ref`, `opaque_ref`; salted hashes, the plaintext subject stays off disk
+- Seam, port table and per-port blind-spot meaning: [docs/seam.md](docs/seam.md)
+
+## Family
+Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), `loomground-lock` (seal state, unseal hooks) and the `loomground-governance` verdict vocabulary. Consumed by hosts, e.g. RVND, through the ports above; optional for every consumer.
+
+Language: loomground — guide https://github.com/flxk1/loomground/blob/main/llms.txt (the .lg language an agent reads, emits, validates); catalogue https://github.com/flxk1/loomground/blob/main/CATALOGUE.json

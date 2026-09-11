@@ -1,0 +1,31 @@
+version = 1
+SPDX-PackageName = "loomground-erasure"
+SPDX-PackageSupplier = "Organization: Loomground Contributors"
+
+# Licence + copyright for files that cannot carry an inline SPDX header: py.typed
+# is an empty marker and JSON has no comment syntax. Everything else in the tree
+# declares SPDX headers inline.
+
+[[annotations]]
+path = "src/loomground_erasure/py.typed"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 flxk1"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["README.md", "llms.txt"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 flxk1"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["requirements-dev.txt", ".gitignore", "NOTICE"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 flxk1"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["release-please-config.json", ".release-please-manifest.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 flxk1"
+SPDX-License-Identifier = "Apache-2.0"

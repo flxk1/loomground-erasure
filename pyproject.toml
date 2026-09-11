@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 flxk1
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loomground-erasure"
+description = "A controller-signed sweep with composite tombstone, pending-erase markers for sealed stores and a forgotten-subjects ledger."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSES/Apache-2.0.txt", "LICENSES/CC-BY-4.0.txt"]
+authors = [{ name = "Loomground Contributors" }]
+# audit-chain: the chain the erasure purges and the legal-basis alphabet.
+# lock: seal state and the unseal hooks pending markers ride on.
+# governance: the verdict vocabulary the three states are read in.
+# workspace: the registry pending_erase walks for sealed descendants.
+# cryptography: Ed25519 marker signatures (through audit-chain signing).
+dependencies = [
+    "loomground-audit-chain>=0.1,<0.2",
+    "loomground-lock>=0.1,<0.2",
+    "loomground-governance>=0.11,<0.12",
+    "loomground-workspace>=0.1,<0.2",
+    "cryptography>=41.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.1.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/flxk1/loomground-erasure"
+Repository = "https://github.com/flxk1/loomground-erasure"
+Issues = "https://github.com/flxk1/loomground-erasure/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "loomground_erasure._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["loomground_erasure*"]
+
+[tool.setuptools.package-data]
+loomground_erasure = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
