@@ -160,10 +160,13 @@ def test_test_home_is_redirected_away_from_the_real_workspace():
     assert not (home / ".workspace" / "keys").exists() or str(home).startswith(os.environ["TMPDIR"])
 
 
-def test_git_tree_has_no_remote_and_flxk1_identity():
+def test_git_tree_has_only_the_flxk1_remote_and_identity():
     if not (REPO / ".git").exists():
         pytest.skip("not a git checkout")
-    remotes = subprocess.run(["git", "-C", str(REPO), "remote"], capture_output=True, text=True).stdout
-    assert remotes.strip() == ""
-    name = subprocess.run(["git", "-C", str(REPO), "config", "user.name"], capture_output=True, text=True).stdout
-    assert name.strip() == "flxk1"
+    for remote in subprocess.run(["git", "-C", str(REPO), "remote"], capture_output=True, text=True).stdout.split():
+        url = subprocess.run(["git", "-C", str(REPO), "remote", "get-url", remote],
+                             capture_output=True, text=True).stdout.strip()
+        assert url.startswith("https://github.com/flxk1/"), url
+    log = subprocess.run(["git", "-C", str(REPO), "log", "--format=%an <%ae>%n%cn <%ce>"],
+                         capture_output=True, text=True).stdout.split("\n")
+    assert set(filter(None, log)) == {"flxk1 <flxk1@users.noreply.github.com>"}
