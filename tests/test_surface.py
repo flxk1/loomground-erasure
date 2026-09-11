@@ -81,6 +81,9 @@ def test_host_compatible_signatures_plus_ports():
                "require_controller"):
         assert p[kw].kind is inspect.Parameter.KEYWORD_ONLY, kw
     assert p["host"].default is None and p["require_controller"].default is False
+    v = _params(erasure.verdict_for)
+    assert list(v) == ["state", "controller_present", "require_controller"]
+    assert v["require_controller"].default is False
     for fn in (erasure.sweep, erasure.dry_run):
         q = _params(fn)
         assert list(q) == ["folder_context", "subject", "cascade", "log_root", "host"]

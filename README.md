@@ -41,7 +41,7 @@ out: request  human erase-req:a7a96ebeee304e50
 
 ## Interface
 
-- States, in the `.lg` alphabet read from `loomground_governance.vocabulary("verdicts")`: `request` → `human` (a person reviews before anything acts) · `sweep` / `dry_run` → `auto` (read only) · `execute` → `auto` when the controller key co-signs; controller key missing → `refused` (`require_controller=True` raises `ControllerKeyMissingError`; the default purges single-key and records `erasure_mode`)
+- States, in the `.lg` alphabet read from `loomground_governance.vocabulary("verdicts")`: `request` → `human` (a person reviews before anything acts) · `sweep` / `dry_run` → `auto` (read only) · `execute` → `auto`, it purged; `erasure_mode` + `controller_countersigned` record two-key/single-key · `refused` only when `require_controller=True` lacks a controller key: `ControllerKeyMissingError` before any write
 - `request(folder, subject, *, requester_ref, reason, log_root=, actor=)` → `{request_id, audit_id, folder}` · `sweep(folder, subject, *, cascade=, log_root=, host=)` → `SweepReport(hits_by_kind, hits_by_folder, estimated_tombstone, versum_sealed, blind_spots)` · `execute(folder, subject, *, legal_basis, requester_ref, reason, cascade=, dry_run=, log_root=, request_id=, queue_if_sealed=, host=, require_controller=)` → `ExecutionReport` · `status(folder, request_id, log_root=)` → manifest
 - `legal_basis` ∈ `loomground_audit_chain.mutation_log.VALID_LEGAL_BASES`
 - Ports (`ErasureHost`, each optional): `pair_from_event`, `discover_descendants`, `replace_ci`, `scan_drafts`, `redact_drafts`, `scan_cards`, `redact_cards`, `erase_versum_mirror`. An absent port is a named blind spot on the report and on the composite tombstone; the chain purge completes.
@@ -55,7 +55,7 @@ Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), 
 
 ## Status
 
-0.1.0 · extracted from RVND `bac579b` · 74 tests · Python >=3.10 · audit-chain 0.1 · lock 0.1 · governance 0.11
+0.1.0 · extracted from RVND `bac579b` · 75 tests · Python >=3.10 · audit-chain 0.1 · lock 0.1 · governance 0.11
 
 ## License
 

@@ -13,7 +13,7 @@ Source: `flxk1/RVND` at commit `bac579b`, `server/src/rvnd/`: `erasure.py`, `pen
 | `rvnd/erasure.py` | `loomground_erasure.erasure` | protocol layer: `SweepHit`, `SweepReport`, `ExecutionReport`, `ErasureGuardRegistrationError`, `request` / `sweep` (`dry_run`) / `status` / `execute`, `_validate_subject`, `_validate_legal_basis`, `_short`, `_redacted_snippet`, `_event_text_haystack`, `_classify_kind`, `_logs_for_sweep`, composite tombstone, forgotten-subjects write, `_write_forgotten_breadcrumb` |
 | — | `loomground_erasure.ports` | new: `ErasureHost`, `BLIND_SPOT_MEANING`, `default_pair_from_event`, `scrub_literal` |
 
-Added on extraction: `erasure.verdict_for(state, controller_present=)` and `erasure.STATES` (the three states in the `.lg` verdict alphabet), `execute(require_controller=)` and `ControllerKeyMissingError`, `ExecutionReport.erasure_mode` / `.verdict` / `.blind_spots`, `SweepReport.blind_spots`, `forgotten_subjects.bind_chain_pair_refs`, `pending_erase.bind_seal_hooks`.
+Added on extraction: `erasure.verdict_for(state, controller_present=, require_controller=)` and `erasure.STATES` (the states in the `.lg` verdict alphabet), `execute(require_controller=)` and `ControllerKeyMissingError` (its `.verdict` is `refused`), `ExecutionReport.erasure_mode` / `.controller_countersigned` / `.verdict` / `.blind_spots`, `SweepReport.blind_spots`, `forgotten_subjects.bind_chain_pair_refs`, `pending_erase.bind_seal_hooks`.
 
 ## Preserved names
 
@@ -41,7 +41,7 @@ Every port is optional. An absent port is named in `SweepReport.blind_spots` / `
 ## Grounding and cross-plane binding
 
 - `VALID_LEGAL_BASES` is imported from `loomground_audit_chain.mutation_log`; there is no second list.
-- Verdicts: `verdict_for` reads `loomground_governance.vocabulary("verdicts")` at call time. `request` → `human`; `sweep` / `dry_run` / `status` → the one member with `releases_at_master` (`auto`); `execute` → `auto` when a controller key co-signs, `refused` when it is missing. `execute(require_controller=True)` enforces the `refused` case by raising `ControllerKeyMissingError` before any write; the default keeps RVND's L0-first behaviour (single-key purge, `erasure_mode: single-key` on the tombstone and report).
+- Verdicts: `verdict_for` reads `loomground_governance.vocabulary("verdicts")` at call time. `request` → `human`; `sweep` / `dry_run` / `status` → the one member with `releases_at_master` (`auto`); `execute` → that same releasing member whenever it purges — two-key when a controller key co-signs, single-key when the operator key signs alone (RVND's L0-first behaviour), recorded as `erasure_mode` on the tombstone and as `erasure_mode` + `controller_countersigned` on the report. A word with `releases_at_master: false` never accompanies a purge that released. `refused` is emitted only where nothing was purged: `execute(require_controller=True)` with no controller key raises `ControllerKeyMissingError` (carrying `.verdict == "refused"`) before any write, and returns no report.
 - Importing the package runs `forgotten_subjects.bind_chain_pair_refs()`: `loomground_audit_chain.mutation_log.purged_pair_ref` is pointed at the folder-salted ref, so the purge tombstone the chain writes and the tracker this package writes name a purged pair identically (`status` stitches by equality). RVND's adapter did the same binding.
 - `pending_erase.bind_seal_hooks(host)` registers `pending_erase_verify` / `pending_erase_apply` on `loomground_lock.host_deps`; both are no-ops while `WORKSPACE_PENDING_ERASE` is unset.
 - `pending_erase.discover_sealed_in_scope` reads `loomground_workspace.workspace_registry.list_known_workspaces` (the raw registry, unscoped). RVND's `adapters.workspace.list_known_workspaces` applies a per-principal scope by default; a host that needs the scoped read wraps `execute` accordingly.
@@ -51,6 +51,7 @@ Every port is optional. An absent port is named in `SweepReport.blind_spots` / `
 - `_redacted_snippet` replaces every occurrence of the subject (the source replaced the first only, so a subject twice within 80 characters survived into the preview).
 - Reports gain `blind_spots`; the composite tombstone gains `extra.blind_spots` (port names, no folders).
 - `apply_markers` reports `blind_spots` and takes `host=`; the host-side draft/card parity moves behind `redact_drafts` / `redact_cards`.
+- `ExecutionReport.to_dict()` gains `verdict`, `erasure_mode` and `controller_countersigned`; RVND reads none of the three and no RVND caller passes `require_controller`, so `rvnd.erasure.execute` behaves through the shim exactly as at `bac579b`.
 
 ## Compatibility constants
 

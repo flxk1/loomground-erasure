@@ -52,12 +52,16 @@ def _releasing() -> str:
     return members[0]
 
 
-def verdict_for(state: str, *, controller_present: Optional[bool] = None) -> str:
-    """The three states in the verdict alphabet read from
+def verdict_for(state: str, *, controller_present: Optional[bool] = None,
+                require_controller: bool = False) -> str:
+    """The verdict a state carries, in the alphabet read from
     ``loomground_governance.vocabulary("verdicts")``: ``request`` is held for
     a person; ``sweep`` / ``dry_run`` / ``status`` read only and release;
-    ``execute`` releases when a controller key co-signs and is refused when
-    the controller key is missing. An unknown state is held."""
+    ``execute`` purges and so releases, whether the controller key co-signed
+    (``erasure_mode`` two-key) or the operator key signed alone (single-key).
+    ``refused`` names the one execute that purges nothing —
+    ``require_controller=True`` with no controller key. An unknown state is
+    held."""
     state = (state or "").strip().lower()
     if state == "request":
         return _alphabet_member("human")
@@ -66,12 +70,20 @@ def verdict_for(state: str, *, controller_present: Optional[bool] = None) -> str
     if state == "execute":
         present = (signing.public_controller_key_fingerprint() is not None
                    if controller_present is None else controller_present)
-        return _releasing() if present else _alphabet_member("refused")
+        if require_controller and not present:
+            return _alphabet_member("refused")
+        return _releasing()
     return _alphabet_member("human")
 
 
 class ControllerKeyMissingError(RuntimeError):
-    """``execute(require_controller=True)`` with no controller key registered."""
+    """``execute(require_controller=True)`` with no controller key registered.
+    Nothing was purged; ``verdict`` is the word for that."""
+
+    @property
+    def verdict(self) -> str:
+        return verdict_for("execute", controller_present=False,
+                           require_controller=True)
 
 
 @dataclass
@@ -154,11 +166,13 @@ class ExecutionReport:
     pending_markers: list[dict[str, Any]] = field(default_factory=list)
     blind_spots: dict[str, list[str]] = field(default_factory=dict)
     erasure_mode: str = ""  # two-key | single-key; "" on dry_run
+    controller_countersigned: bool = False
     verdict: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "erasure_mode": self.erasure_mode,
+            "controller_countersigned": self.controller_countersigned,
             "verdict": self.verdict,
             "request_id": self.request_id,
             "subject": self.subject,
@@ -564,9 +578,11 @@ def execute(
     ``controller_signer`` is accepted for signature symmetry; the chain's
     ``purge`` co-signs with the controller key when one exists (two-key) and
     otherwise signs with the operator key alone (single-key), recording
-    ``erasure_mode`` on the tombstone. ``require_controller=True`` turns a
-    missing controller key into :class:`ControllerKeyMissingError` before
-    anything is written (the ``refused`` verdict). ``queue_if_sealed`` arms a
+    ``erasure_mode`` on the tombstone and ``controller_countersigned`` on the
+    report. Both modes purge, so both carry the releasing verdict.
+    ``require_controller=True`` turns a missing controller key into
+    :class:`ControllerKeyMissingError` before anything is written — the one
+    execute that is ``refused``. ``queue_if_sealed`` arms a
     pending marker for a sealed root instead of raising ``SealedWriteError``
     (feature flag required); sealed descendants are always queued when the
     feature is on. Absent host ports are named in ``blind_spots``.
@@ -608,11 +624,13 @@ def execute(
         sealed_to_arm = [f for f in sealed_in_scope if f != root_ctx or queue_if_sealed]
     report.sweep.pending_erase_queued = sorted(sealed_to_arm)
     report.verdict = verdict_for("dry_run" if dry_run else "execute",
-                                 controller_present=controller_present)
+                                 controller_present=controller_present,
+                                 require_controller=require_controller)
 
     if dry_run:
         return report
     report.erasure_mode = "two-key" if controller_present else "single-key"
+    report.controller_countersigned = controller_present
 
     try:
         subject_hash, guard_added = forgotten_subjects.ensure(

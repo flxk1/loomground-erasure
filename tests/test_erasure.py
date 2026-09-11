@@ -90,6 +90,7 @@ def test_dry_run_makes_no_writes(isolated_env):
     assert report.composite_tombstone_id == ""
     assert report.purged_event_count == 0
     assert report.erasure_mode == ""
+    assert report.controller_countersigned is False
     assert report.verdict == "auto"
     assert len(list(log.replay())) == len(before)
     assert forgotten_subjects.list_subjects(ws) == []
@@ -103,6 +104,7 @@ def test_execute_writes_composite_tombstone(isolated_env):
                       reason="consent withdrawn")
     assert report.composite_tombstone_id.startswith("erase-composite:")
     assert report.erasure_mode == "two-key"
+    assert report.controller_countersigned is True and report.verdict == "auto"
     composites = [e for e in MutationLog(ws, log_root=lr).replay()
                   if e.event == "system" and (e.extra or {}).get("kind") == "erasure_composite"]
     assert len(composites) == 1
@@ -166,7 +168,10 @@ def test_execute_single_key_without_controller(tmp_path):
                              requester_ref="r", reason="t", log_root=lr)
     assert report.purged_event_count >= 1
     assert report.erasure_mode == "single-key"
-    assert report.verdict == "refused"
+    assert report.controller_countersigned is False
+    # the purge released, so the verdict is the releasing word, not `refused`
+    assert report.verdict == "auto"
+    assert report.to_dict()["verdict"] == "auto"
     assert signing.public_controller_key_fingerprint() is None
     tomb = [e for e in MutationLog(ws, log_root=lr).replay() if e.event == "purge"]
     assert tomb and tomb[0].extra.get("erasure_mode") == "single-key"
@@ -178,9 +183,10 @@ def test_require_controller_refuses_before_any_write(tmp_path):
     ws.mkdir()
     seed_pair(ws, lr, pair_id="sha256:x", summary="About Jane Doe")
     before = list(MutationLog(ws, log_root=lr).replay())
-    with pytest.raises(erasure.ControllerKeyMissingError):
+    with pytest.raises(erasure.ControllerKeyMissingError) as exc:
         erasure.execute(str(ws), "Jane Doe", legal_basis="art_17_1_a", requester_ref="r",
                         reason="t", log_root=lr, require_controller=True)
+    assert exc.value.verdict == "refused"
     assert [e.audit_id for e in MutationLog(ws, log_root=lr).replay()] == [e.audit_id for e in before]
     assert forgotten_subjects.list_subjects(ws) == []
 
@@ -191,10 +197,25 @@ def test_verdict_words_come_from_the_governance_alphabet():
     assert erasure.verdict_for("request") == "human"
     assert erasure.verdict_for("sweep") == erasure.verdict_for("dry_run") == "auto"
     assert erasure.verdict_for("execute", controller_present=True) == "auto"
-    assert erasure.verdict_for("execute", controller_present=False) == "refused"
+    assert erasure.verdict_for("execute", controller_present=False) == "auto"
+    assert erasure.verdict_for("execute", controller_present=True,
+                               require_controller=True) == "auto"
+    assert erasure.verdict_for("execute", controller_present=False,
+                               require_controller=True) == "refused"
     assert erasure.verdict_for("something-else") == "human"
     for state in erasure.STATES:
         assert erasure.verdict_for(state, controller_present=True) in alphabet
+
+
+def test_only_a_non_releasing_verdict_accompanies_a_purge_that_released():
+    """The verdict word means what the governance vocabulary says it means:
+    a report whose purge released never carries a non-releasing word."""
+    from loomground_governance import vocabulary
+    releases = vocabulary("verdicts")["releases_at_master"]
+    for present in (True, False):
+        assert releases[erasure.verdict_for("execute", controller_present=present)] is True
+    assert releases[erasure.verdict_for("execute", controller_present=False,
+                                        require_controller=True)] is False
 
 
 def test_forgotten_subject_blocks_reingest_via_check(isolated_env):
