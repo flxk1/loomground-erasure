@@ -2,6 +2,13 @@
 <!-- Copyright 2026 flxk1 -->
 # Changelog
 
+## [0.1.1](https://github.com/flxk1/loomground-erasure/compare/loomground-erasure-v0.1.0...loomground-erasure-v0.1.1) (2026-09-12)
+
+
+### Dependencies
+
+* admit loomground-lock 0.2 ([084fb51](https://github.com/flxk1/loomground-erasure/commit/084fb51da224f0f34aacacaea69f5aa1d38072dc))
+
 ## 0.1.0
 
 * Published the erasure protocol, pending markers, and forgotten-subject ledger as `loomground_erasure.{erasure,pending_erase,forgotten_subjects}`.
