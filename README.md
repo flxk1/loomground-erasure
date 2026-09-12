@@ -51,11 +51,11 @@ out: request  human erase-req:a7a96ebeee304e50
 
 ## Family
 
-Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), `loomground-lock` (seal state, unseal hooks) and the `loomground-governance` verdict vocabulary. Consumed by hosts, e.g. RVND, through the ports above; optional for every consumer.
+Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), `loomground-lock` (seal state, unseal hooks) and the `loomground-governance` verdict vocabulary. Hosts consume it through the ports above; it is optional for every consumer.
 
 ## Status
 
-0.1.0 · extracted from RVND `bac579b` · 75 tests · Python >=3.10 · audit-chain 0.1 · lock 0.1 · governance 0.11
+0.1.0 · 75 tests · Python >=3.10 · audit-chain 0.1 · lock 0.2 · governance 0.11
 
 ## License
 

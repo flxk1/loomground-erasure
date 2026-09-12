@@ -34,6 +34,6 @@ status("ws", req["request_id"], log_root="logs")
 - Seam, port table and per-port blind-spot meaning: [docs/seam.md](docs/seam.md)
 
 ## Family
-Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), `loomground-lock` (seal state, unseal hooks) and the `loomground-governance` verdict vocabulary. Consumed by hosts, e.g. RVND, through the ports above; optional for every consumer.
+Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), `loomground-lock` (seal state, unseal hooks) and the `loomground-governance` verdict vocabulary. Hosts consume it through the ports above; it is optional for every consumer.
 
 Language: loomground — guide https://github.com/flxk1/loomground/blob/main/llms.txt (the .lg language an agent reads, emits, validates); catalogue https://github.com/flxk1/loomground/blob/main/CATALOGUE.json

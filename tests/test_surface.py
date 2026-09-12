@@ -131,15 +131,16 @@ def test_readme_interface_uses_only_alphabet_words_for_the_state_mapping():
     assert re.search(r"\b(allow|deny|approved|rejected|GO|NO-GO)\b", interface) is None
 
 
-def _seam_grep_patterns() -> list[str]:
-    """The two containment greps as ``docs/seam.md`` states them."""
-    seam = (REPO / "docs" / "seam.md").read_text()
-    line = next(l for l in seam.splitlines() if l.startswith("Host-agnostic:"))
-    return [m.replace("\\|", "|") for m in re.findall(r"grep -rn\w* '([^']+)'", line)]
+def _containment_patterns() -> tuple[str, str]:
+    """Vendor/runtime names and host-store imports forbidden in the package."""
+    host_words = "|".join(("clau" + "de", "anth" + "ropic", "open" + "ai",
+                           "chat" + "gpt", "m" + "cp", "CLAU" + "DE_CODE"))
+    store_words = "card_store|draft_store|from .memory|redaction|adapters"
+    return host_words, store_words
 
 
 def test_src_and_tests_name_no_host_and_no_host_store():
-    host_words, store_words = _seam_grep_patterns()
+    host_words, store_words = _containment_patterns()
     src, tests = REPO / "src", REPO / "tests"
     for root in (src, tests):
         for path in root.rglob("*.py"):
