@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "loomground-erasure"
-description = "A controller-signed sweep with composite tombstone, pending-erase markers for sealed stores and a forgotten-subjects ledger."
+description = "Controller-signed erasure over a signed audit chain: sweep, composite tombstone, pending markers for sealed stores, a ledger that refuses re-ingestion."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
