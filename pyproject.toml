@@ -17,11 +17,15 @@ authors = [{ name = "Loomground Contributors" }]
 # governance: the verdict vocabulary the three states are read in.
 # workspace: the registry pending_erase walks for sealed descendants.
 # cryptography: Ed25519 marker signatures (through audit-chain signing).
+# First-party siblings are direct git references, not ranges: no index serves this
+# family. Each ref is the release tag loomground's RELEASES.json records, and the full
+# transitive closure is declared, because those tagged commits still carry ranges that
+# only these URLs can satisfy.
 dependencies = [
-    "loomground-audit-chain>=0.1,<0.2",
-    "loomground-lock>=0.1,<0.3",
-    "loomground-governance>=0.11,<0.12",
-    "loomground-workspace>=0.1,<0.2",
+    "loomground-audit-chain @ git+https://github.com/flxk1/loomground-audit-chain@loomground-audit-chain-v0.1.0",
+    "loomground-lock @ git+https://github.com/flxk1/loomground-lock@loomground-lock-v0.2.0",
+    "loomground-governance @ git+https://github.com/flxk1/loomground-governance@loomground-governance-v0.11.1",
+    "loomground-workspace @ git+https://github.com/flxk1/loomground-workspace@v0.1.0",
     "cryptography>=41.0",
 ]
 dynamic = ["version"]
