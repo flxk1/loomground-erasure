@@ -1,5 +1,5 @@
 # Git-pinned first-party planes at their release tags (no index yet). Install BEFORE `pip install .` so the ranges resolve.
-loomground-governance @ git+https://github.com/flxk1/loomground-governance@cf09ad8336c0ef47e700952896314472129fa4c7
-loomground-workspace @ git+https://github.com/flxk1/loomground-workspace@e6e5e7dae8dc11e089a11dc15f3b519d2e4750ad
-loomground-lock @ git+https://github.com/flxk1/loomground-lock@b8a26930fd301d0181139fbb5665342fd614ef8e
+loomground-governance @ git+https://github.com/flxk1/loomground-governance@2a1e8a0b4fe9de6c4d273eb50e401342d6b275fc
+loomground-workspace @ git+https://github.com/flxk1/loomground-workspace@b022d61f7c5e5d3dae85cf037f09ec4d446a3eb7
+loomground-lock @ git+https://github.com/flxk1/loomground-lock@f99e24b79278f42c7fcfdf5394bb6aea8173a91f
 loomground-audit-chain @ git+https://github.com/flxk1/loomground-audit-chain@7a6e7a4dab006862391d35309c1a65a3023992b3
