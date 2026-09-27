@@ -67,7 +67,8 @@ host = ErasureHost(
     erase_versum_mirror=erase_mirror,
 )
 bind_seal_hooks(host)
-report = execute(folder, subject, legal_basis="art_17_1_b", host=host)
+report = execute(folder, subject, legal_basis="art_17_1_b",
+                 requester_ref=requester_ref, reason=reason, host=host)
 ```
 
 The host owns its card, draft, memory, redaction, mirrored-knowledge, and

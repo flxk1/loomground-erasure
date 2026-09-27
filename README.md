@@ -11,7 +11,7 @@ Erasure means deleting a row; the subject returns with the next ingest. A contro
 ## Install
 
 ```
-pip install -r requirements-dev.txt && pip install loomground-erasure
+pip install git+https://github.com/flxk1/loomground-erasure
 ```
 
 Requires `loomground-audit-chain` 0.1, `loomground-lock` 0.1, `loomground-governance` 0.11, `loomground-workspace` 0.1, `cryptography`. Python 3.10+.
@@ -56,6 +56,10 @@ Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), 
 ## Status
 
 0.1.0 · 75 tests · Python >=3.10 · audit-chain 0.1 · lock 0.2 · governance 0.11
+
+## How this is made
+
+The code and documentation are written with Loomground agents running on Claude (Anthropic). The maintainer reads and corrects all of it.
 
 ## License
 
