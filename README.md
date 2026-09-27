@@ -59,7 +59,7 @@ Runtime controls. Consumes `loomground-audit-chain` (chain, keys, legal bases), 
 
 ## How this is made
 
-The code and documentation are written with Loomground agents running on Claude (Anthropic). The maintainer reads and corrects all of it.
+The code and documentation are written with Loomground agents. The maintainer reads and corrects all of it.
 
 ## License
 
