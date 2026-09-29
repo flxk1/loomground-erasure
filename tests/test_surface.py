@@ -161,6 +161,21 @@ def test_test_home_is_redirected_away_from_the_real_workspace():
     assert not (home / ".workspace" / "keys").exists() or str(home).startswith(os.environ["TMPDIR"])
 
 
+# The only identities a commit may carry: the maintainer's no-reply address, and the
+# GitHub identities a pull-request merge or the release bot writes. None is personal.
+ALLOWED_GIT_IDENTITIES = frozenset({
+    "flxk1 <flxk1@users.noreply.github.com>",
+    "Flxk1 <213685884+flxk1@users.noreply.github.com>",
+    "GitHub <noreply@github.com>",
+    "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>",
+})
+
+
+def test_allowed_git_identities_exclude_a_personal_address():
+    assert "Jane Doe <jane@example.org>" not in ALLOWED_GIT_IDENTITIES
+    assert all("noreply" in identity for identity in ALLOWED_GIT_IDENTITIES)
+
+
 def test_git_tree_has_only_the_flxk1_remote_and_identity():
     if not (REPO / ".git").exists():
         pytest.skip("not a git checkout")
@@ -170,4 +185,5 @@ def test_git_tree_has_only_the_flxk1_remote_and_identity():
         assert url.startswith("https://github.com/flxk1/"), url
     log = subprocess.run(["git", "-C", str(REPO), "log", "--format=%an <%ae>%n%cn <%ce>"],
                          capture_output=True, text=True).stdout.split("\n")
-    assert set(filter(None, log)) == {"flxk1 <flxk1@users.noreply.github.com>"}
+    identities = set(filter(None, log))
+    assert identities and identities <= ALLOWED_GIT_IDENTITIES, identities - ALLOWED_GIT_IDENTITIES
