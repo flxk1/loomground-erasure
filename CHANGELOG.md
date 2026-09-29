@@ -2,6 +2,19 @@
 <!-- Copyright 2026 flxk1 -->
 # Changelog
 
+## [0.1.1](https://github.com/flxk1/loomground-erasure/compare/loomground-erasure-v0.1.0...loomground-erasure-v0.1.1) (2026-09-29)
+
+
+### Dependencies
+
+* admit loomground-lock 0.2 ([084fb51](https://github.com/flxk1/loomground-erasure/commit/084fb51da224f0f34aacacaea69f5aa1d38072dc))
+
+
+### Documentation
+
+* correct stale statements and add How this is made ([412e772](https://github.com/flxk1/loomground-erasure/commit/412e7721349c7cf7cfff5466189910fb58265d96))
+* How this is made names no model vendor ([3638541](https://github.com/flxk1/loomground-erasure/commit/363854164e81988bf09178aaf0e8d3f130f8ab0c))
+
 ## 0.1.0
 
 * Published the erasure protocol, pending markers, and forgotten-subject ledger as `loomground_erasure.{erasure,pending_erase,forgotten_subjects}`.
